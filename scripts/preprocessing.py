@@ -4,10 +4,6 @@ from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 from keras.utils.np_utils import to_categorical 
 
-# Shuffle
-train = shuffle(train, )
-test = shuffle(test)
-
 def GetProcessedData(train, test, train_val_prop = 0.25, rnd_seed = 0):
     # Shuffle
     train = shuffle(train, random_state = rnd_seed)
@@ -19,8 +15,8 @@ def GetProcessedData(train, test, train_val_prop = 0.25, rnd_seed = 0):
     del train
 
     # Reshape images (from vector to matrix)
-    x_train.values.reshape(-1, 28, 28, 1)
-    test.values.reshape(-1, 28, 28, 1)
+    x_train = x_train.values.reshape(-1, 28, 28, 1)
+    test = test.values.reshape(-1, 28, 28, 1)
 
     # Value to categorical variable
     y_train = to_categorical(y_train, num_classes=10)
