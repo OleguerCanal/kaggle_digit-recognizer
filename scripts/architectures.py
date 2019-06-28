@@ -1,7 +1,7 @@
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Dropout, Flatten, Dense
 
-def SimpleCnnClassification(input_shape):
+def simple_cnn_classification(input_shape):
     model = Sequential()
 
     # Feature Extraction Block 1

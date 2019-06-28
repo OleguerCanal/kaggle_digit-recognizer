@@ -1,6 +1,6 @@
 from keras.preprocessing.image import ImageDataGenerator
 
-def GetSimpleImageAugmentation():
+def simple_image_augmentation():
     datagen = ImageDataGenerator(
         featurewise_center=False,  # set input mean to 0 over the dataset
         samplewise_center=False,  # set each sample mean to 0
