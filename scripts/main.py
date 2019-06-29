@@ -11,7 +11,7 @@ if __name__ == "__main__":
     raw_train = pd.read_csv("../input/train.csv")
     raw_test =  pd.read_csv("../input/test.csv")
 
-    raw_train = raw_train.sample(frac=0.05)
+    raw_train = raw_train.sample(frac=0.01)
 
     # 2. Process data
     x_train, y_train, x_val, y_val, x_test = GetProcessedData(raw_train, raw_test)
@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     # 3. Define Model
     epochs = 2 # Turn epochs to 30 to get 0.9967 accuracy
-    batch_size = 50
+    batch_size = 10
     optimizer = RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
     loss = "categorical_crossentropy"
     metrics = ["accuracy"]
