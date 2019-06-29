@@ -4,7 +4,7 @@ from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 from keras.utils.np_utils import to_categorical 
 
-def GetProcessedData(train, test, train_val_prop = 0.25, rnd_seed = 0):
+def preprocess_data(train, test, train_val_prop = 0.25, rnd_seed = 0):
     # Shuffle
     train = shuffle(train, random_state = rnd_seed)
     test = shuffle(test, random_state = rnd_seed)

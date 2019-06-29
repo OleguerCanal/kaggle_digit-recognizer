@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+import numpy as np
+import itertools
 
-def PlotHistory(history):
+def plot_history(history):
     fig, ax = plt.subplots(2,1)
     ax[0].plot(history.history['loss'], color='b', label="Training loss")
     ax[0].plot(history.history['val_loss'], color='r', label="validation loss",axes =ax[0])
@@ -9,10 +12,11 @@ def PlotHistory(history):
     ax[1].plot(history.history['acc'], color='b', label="Training accuracy")
     ax[1].plot(history.history['val_acc'], color='r',label="Validation accuracy")
     legend = ax[1].legend(loc='best', shadow=True)
+    plt.show()
     return
 
 
-def plot_confusion_matrix(cm, classes,
+def plot_confusion_matrix(y_pred, y_val, classes,
                           normalize=False,
                           title='Confusion matrix',
                           cmap=plt.cm.Blues):
@@ -20,6 +24,11 @@ def plot_confusion_matrix(cm, classes,
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
     """
+    y_pred_classes = np.argmax(y_pred, axis = 1)  # One-hot vector (get max prob)
+    y_true = np.argmax(y_val, axis = 1)  # One-hot vecotr
+    cm = confusion_matrix(y_pred_classes, y_true) 
+
+
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
     plt.colorbar()
@@ -39,3 +48,4 @@ def plot_confusion_matrix(cm, classes,
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+    plt.show()
