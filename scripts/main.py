@@ -5,6 +5,7 @@ from architectures import simple_cnn_classification
 from keras.optimizers import RMSprop
 from datagenerators import simple_image_augmentation
 from results_analysis import plot_history, plot_confusion_matrix
+from callbacks import TelegramSummary
 
 if __name__ == "__main__":
     # 1. Load data
@@ -21,7 +22,7 @@ if __name__ == "__main__":
 
     # 3. Define Model
     epochs = 10 # Turn epochs to 30 to get 0.9967 accuracy
-    batch_size = 60
+    batch_size = 80
     optimizer = RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
     loss = "categorical_crossentropy"
     metrics = ["accuracy"]
@@ -29,21 +30,23 @@ if __name__ == "__main__":
     model = simple_cnn_classification(input_shape = x_train[0].shape)
     model.compile(optimizer = optimizer, loss = loss, metrics = metrics)
 
-    # 4. Get DataGenerator (image augmentation)
+    # 4. Fit Model
     datagen = simple_image_augmentation()
     datagen.fit(x_train)
+    telegram_summary = TelegramSummary()
+    callbacks = [telegram_summary]
 
-    # 5. Fit Model
     history = model.fit_generator(
                         generator = datagen.flow(x_train, y_train, batch_size=batch_size),
                         epochs = epochs,
                         validation_data = (x_val, y_val),
-                        verbose = 2,
+                        verbose = 1,
+                        callbacks = callbacks,
                         steps_per_epoch = x_train.shape[0])
     
     a = input("enter")
 
-    # 6 Analyze results
+    # 5. Analyze results
     plot_history(history)
 
     y_pred = model.predict(x_val)
