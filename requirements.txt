@@ -5,3 +5,4 @@ numpy==1.16.4
 scikit_learn==0.21.2
 requests
 Tensorboard
+h5py
