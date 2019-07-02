@@ -20,28 +20,21 @@ def load_saved_model():
     loaded_model.load_weights("model.h5")
     print("Loaded model from disk")
 
-def get_submission(model, test, csv_path = "../input/solution.csv"):
-    results = model.predict(test)
-    results = np.argmax(results, axis = 1)
-    results = pd.Series(results, name="Label")
-    submission = pd.concat([pd.Series(range(1, 28001), name = "ImageId"), results], axis = 1)
-    submission.to_csv(csv_path, index = False)
-
 if __name__ == "__main__":
     # 1. Load data
     raw_train = pd.read_csv("../input/train.csv")
     raw_test =  pd.read_csv("../input/test.csv")
 
-    raw_train = raw_train.sample(frac=0.01)  # Only to test pipeline
+    # raw_train = raw_train.sample(frac=0.01)  # Only to test pipeline
 
     # 2. Process data
     x_train, y_train, x_val, y_val, x_test = preprocess_data(raw_train, raw_test)
     del raw_train, raw_test
 
     # 3. Define Model
-    epochs = 10 # Turn epochs to 30 to get 0.9967 accuracy
-    batch_size = 80
-    optimizer = RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
+    epochs = 30 # Turn epochs to 30 to get 0.9967 accuracy
+    batch_size = 60
+    optimizer = RMSprop(lr=0.01, rho=0.9, epsilon=1e-08, decay=0.0)
     loss = "categorical_crossentropy"
     metrics = ["accuracy"]
 
@@ -70,10 +63,10 @@ if __name__ == "__main__":
     tensorboard = TensorBoard(log_dir="../logs/{}".format(time()))
     learning_rate_reduction = ReduceLROnPlateau(
                                             monitor = 'val_acc', 
-                                            patience = 3,
+                                            patience = 4,
                                             verbose = 1,
-                                            factor = 0.5,  # Each epoch reduce lr by half
-                                            min_lr = 0.00001)
+                                            factor = 0.8,  # Each epoch reduce lr by half
+                                            min_lr = 0.0001)
     callbacks = [telegram_summary, tensorboard, learning_rate_reduction, checkpoint]
 
     # 4. Fit Model
@@ -87,7 +80,5 @@ if __name__ == "__main__":
                         steps_per_epoch = x_train.shape[0])
     
     # 5. Analyze results
-    # plot_history(history)
-
     y_pred = model.predict(x_val)
     plot_confusion_matrix(y_pred = y_pred, y_val = y_val, classes = range(10))
