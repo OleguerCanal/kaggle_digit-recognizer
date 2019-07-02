@@ -32,14 +32,14 @@ if __name__ == "__main__":
     raw_train = pd.read_csv("../input/train.csv")
     raw_test =  pd.read_csv("../input/test.csv")
 
-    raw_train = raw_train.sample(frac=0.01)  # Only to test pipeline
+    # raw_train = raw_train.sample(frac=0.01)  # Only to test pipeline
 
     # 2. Process data
     x_train, y_train, x_val, y_val, x_test = preprocess_data(raw_train, raw_test)
     del raw_train, raw_test
 
     # 3. Define Model
-    epochs = 10 # Turn epochs to 30 to get 0.9967 accuracy
+    epochs = 30 # Turn epochs to 30 to get 0.9967 accuracy
     batch_size = 80
     optimizer = RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
     loss = "categorical_crossentropy"
