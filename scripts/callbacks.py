@@ -10,11 +10,11 @@ class TelegramSummary(Callback):
         self.telegram_bot = TelegramBot()
 
     def on_train_begin(self, logs={}):
-        answer = self.telegram_bot.send("Training started! \xF0\x9F\x90\xA2")
+        answer = self.telegram_bot.send("Training started..........")
         return
 
     def on_train_end(self, logs={}):
-        answer = self.telegram_bot.send("Training finished! \xF0\x9F\x90\xA7")
+        answer = self.telegram_bot.send("Training finished..........")
         return
 
     def on_epoch_begin(self, epoch, logs={}):
