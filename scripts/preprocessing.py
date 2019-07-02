@@ -19,8 +19,6 @@ def preprocess_data(train, train_val_prop = 0.25, rnd_seed = 1):
 
     # Reshape images (from vector to matrix)
     x_train = common_preprocessing(x_train)
-    x_train = x_train.values.reshape(-1, 28, 28, 1)
-    test = test.values.reshape(-1, 28, 28, 1)
 
     # Value to categorical variable
     y_train = to_categorical(y_train, num_classes=10)

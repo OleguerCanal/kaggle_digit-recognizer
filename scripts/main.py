@@ -23,13 +23,13 @@ def load_saved_model():
 if __name__ == "__main__":
     # 1. Load data
     raw_train = pd.read_csv("../input/train.csv")
-    raw_test =  pd.read_csv("../input/test.csv")
+    # raw_test =  pd.read_csv("../input/test.csv")
 
     # raw_train = raw_train.sample(frac=0.01)  # Only to test pipeline
 
     # 2. Process data
-    x_train, y_train, x_val, y_val, x_test = preprocess_data(raw_train, raw_test)
-    del raw_train, raw_test
+    x_train, y_train, x_val, y_val = preprocess_data(raw_train)
+    del raw_train
 
     # 3. Define Model
     epochs = 30 # Turn epochs to 30 to get 0.9967 accuracy
