@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 from keras.utils.np_utils import to_categorical 
+import seaborn as sns
 
 def common_preprocessing(df):
     df = df.values.reshape(-1, 28, 28, 1)
@@ -19,6 +20,8 @@ def preprocess_data(train, train_val_prop = 0.25, rnd_seed = 1):
 
     # Reshape images (from vector to matrix)
     x_train = common_preprocessing(x_train)
+
+    # sns.countplot(y_train)
 
     # Value to categorical variable
     y_train = to_categorical(y_train, num_classes=10)

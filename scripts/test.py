@@ -26,7 +26,7 @@ def get_submission(model, test, csv_path = "../input/solution.csv"):
 
 if __name__ == "__main__":
     architecture_path = "../models/architecture.json"
-    weights_path = "../models/weights-25-0.93.hdf5"
+    weights_path = "../models/weights-14-0.97.hdf5"
     input_path = "../input/test.csv"
 
     model = load_model(architecture_path = architecture_path,

@@ -9,6 +9,8 @@ from keras.models import model_from_json
 from datagenerators import simple_image_augmentation
 from results_analysis import plot_history, plot_confusion_matrix
 from callbacks import TelegramSummary, TensorBoard, ReduceLROnPlateau, ModelCheckpoint
+import seaborn as sns
+
 
 def load_saved_model(weights_path, architecture_path = "../models/architecture.json"):
     # load json and create model
@@ -32,13 +34,13 @@ if __name__ == "__main__":
 
     # 3. Define Model
     epochs = 30 # Turn epochs to 30 to get 0.9967 accuracy
-    batch_size = 60
-    optimizer = RMSprop(lr=0.01, rho=0.9, epsilon=1e-08, decay=0.0)
+    batch_size = 86
+    optimizer = RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
     loss = "categorical_crossentropy"
     metrics = ["accuracy"]
 
     # model = simple_cnn_classification(input_shape = x_train[0].shape)  # If you wanna start from random weights
-    model = load_saved_model(weights_path = "../models/weights-08-0.55.hdf5")  # To start with pretrained weights
+    model = load_saved_model(weights_path = "../models/weights-14-0.97.hdf5")  # To start with pretrained weights
     model.compile(optimizer = optimizer, loss = loss, metrics = metrics)
 
     # serialize model to JSON
@@ -63,10 +65,10 @@ if __name__ == "__main__":
     tensorboard = TensorBoard(log_dir="../logs/{}".format(time()))
     learning_rate_reduction = ReduceLROnPlateau(
                                             monitor = 'val_acc', 
-                                            patience = 4,
+                                            patience = 3,
                                             verbose = 1,
-                                            factor = 0.8,  # Each epoch reduce lr by half
-                                            min_lr = 0.0001)
+                                            factor = 0.5,  # Each epoch reduce lr by half
+                                            min_lr = 0.00001)
     callbacks = [telegram_summary, tensorboard, learning_rate_reduction, checkpoint]
 
     # 4. Fit Model
