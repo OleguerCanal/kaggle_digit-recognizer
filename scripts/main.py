@@ -10,21 +10,20 @@ from datagenerators import simple_image_augmentation
 from results_analysis import plot_history, plot_confusion_matrix
 from callbacks import TelegramSummary, TensorBoard, ReduceLROnPlateau, ModelCheckpoint
 
-def load_saved_model():
+def load_saved_model(weights_path, architecture_path = "../models/architecture.json"):
     # load json and create model
-    json_file = open('model.json', 'r')
+    json_file = open(architecture_path, "r")
     loaded_model_json = json_file.read()
     json_file.close()
     loaded_model = model_from_json(loaded_model_json)
     # load weights into new model
-    loaded_model.load_weights("model.h5")
+    loaded_model.load_weights(weights_path)
     print("Loaded model from disk")
+    return loaded_model
 
 if __name__ == "__main__":
     # 1. Load data
     raw_train = pd.read_csv("../input/train.csv")
-    # raw_test =  pd.read_csv("../input/test.csv")
-
     # raw_train = raw_train.sample(frac=0.01)  # Only to test pipeline
 
     # 2. Process data
@@ -38,7 +37,8 @@ if __name__ == "__main__":
     loss = "categorical_crossentropy"
     metrics = ["accuracy"]
 
-    model = simple_cnn_classification(input_shape = x_train[0].shape)
+    # model = simple_cnn_classification(input_shape = x_train[0].shape)  # If you wanna start from random weights
+    model = load_saved_model(weights_path = "../models/weights-08-0.55.hdf5")  # To start with pretrained weights
     model.compile(optimizer = optimizer, loss = loss, metrics = metrics)
 
     # serialize model to JSON
