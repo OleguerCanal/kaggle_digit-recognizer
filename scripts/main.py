@@ -39,8 +39,8 @@ if __name__ == "__main__":
     loss = "categorical_crossentropy"
     metrics = ["accuracy"]
 
-    # model = simple_cnn_classification(input_shape = x_train[0].shape)  # If you wanna start from random weights
-    model = load_saved_model(weights_path = "../models/weights-14-0.97.hdf5")  # To start with pretrained weights
+    model = simple_cnn_classification(input_shape = x_train[0].shape)  # If you wanna start from random weights
+    # model = load_saved_model(weights_path = "../models/weights-14-0.97.hdf5")  # To start with pretrained weights
     model.compile(optimizer = optimizer, loss = loss, metrics = metrics)
 
     # serialize model to JSON
