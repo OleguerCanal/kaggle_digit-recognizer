@@ -108,5 +108,6 @@ venv.bak/
 logs/
 input/
 models/
+best_models/
 .vscode/
 *__pycache__/

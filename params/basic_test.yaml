@@ -1,0 +1,32 @@
+sample_data: 1.  # To test pipeline with less data (default: 1.)
+
+# Data-split:
+val_prop: 0.25 # Prop of data used for validation
+random_seed: 1
+
+# Training:
+train_from_saved_weights: False
+architecture: "simple_cnn_classification"
+epochs: 30
+batch_size: 68
+loss: "categorical_crossentropy"
+metrics: ["accuracy"]
+
+# Optimizer:
+optimizer: "RMSprop"  # Only only one implemented
+learning_rate: 0.001
+rho: 0.9
+epsilon: 1e-08
+decay: 0.0
+
+# Datagenerators:
+datagenerator: "simple_image_augmentation"
+
+# Paths:
+# save
+model_logging_path: "models/"  # Where to save params, architecture and weights
+tensorboard_logging_path: "logs/"  # Where to save tensorboard data
+data_path: "input/train.csv"
+
+# load
+saved_weights_path: ""  # If train_from_saved_weights

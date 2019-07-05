@@ -3,14 +3,13 @@ import numpy as np
 import os
 from time import time
 from preprocessing import preprocess_data
-from architectures import simple_cnn_classification
+from architectures.* import simple_cnn_classification
 from keras.optimizers import RMSprop
 from keras.models import model_from_json
 from datagenerators import simple_image_augmentation
 from results_analysis import plot_history, plot_confusion_matrix
 from callbacks import TelegramSummary, TensorBoard, ReduceLROnPlateau, ModelCheckpoint
 import seaborn as sns
-
 
 def load_saved_model(weights_path, architecture_path = "../models/architecture.json"):
     # load json and create model
@@ -34,13 +33,13 @@ if __name__ == "__main__":
 
     # 3. Define Model
     epochs = 30 # Turn epochs to 30 to get 0.9967 accuracy
-    batch_size = 86
+    batch_size = 50
     optimizer = RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
     loss = "categorical_crossentropy"
     metrics = ["accuracy"]
 
     model = simple_cnn_classification(input_shape = x_train[0].shape)  # If you wanna start from random weights
-    # model = load_saved_model(weights_path = "../models/weights-14-0.97.hdf5")  # To start with pretrained weights
+    # model = load_saved_model(weights_path = "../models/weights-27-0.96.hdf5")  # To start with pretrained weights
     model.compile(optimizer = optimizer, loss = loss, metrics = metrics)
 
     # serialize model to JSON
@@ -52,6 +51,8 @@ if __name__ == "__main__":
     # Datagen
     datagen = simple_image_augmentation()
     datagen.fit(x_train)
+#    datagen_val = simple_image_augmentation()
+ #   datagen_val.fit(x_val)
 
     # Callbacks:
     weights_filepath = "../models/weights-{epoch:02d}-{val_acc:.2f}.hdf5"

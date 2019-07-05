@@ -8,7 +8,7 @@ def simple_cnn_classification(input_shape):
     model.add(Conv2D(
                     input_shape = input_shape,
                     filters = 32,
-                    kernel_size = (6, 6),
+                    kernel_size = (5, 5),
                     strides = (1, 1),
                     padding = "same",
                     activation = "relu"))
