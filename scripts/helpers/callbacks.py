@@ -1,7 +1,12 @@
+from pathlib import Path
+import sys
+
 from keras.callbacks import TensorBoard
 from keras.callbacks import ReduceLROnPlateau
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import Callback
+
+sys.path.append(str(Path(__file__).parent))
 from telegram_bot.telegram_bot import TelegramBot
 
 # Inherit callback class and overwrite on_epoch_end method

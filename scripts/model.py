@@ -1,22 +1,28 @@
 import datetime
 import os
+import pandas as pd
+from pathlib import Path
+import sys
 import time
 import yaml
 
 # Keras
 from keras.models import model_from_json
+from keras.optimizers import RMSprop
 
-# Own imports
-from architectures.* import simple_cnn_classification
-from data_processing.* import preprocess_data
-from helpers.* import callbacks
+# Own imports TODO(oleguer): Fix this path problem
+sys.path.append(str(Path(__file__).parent))
+from architectures.simple_cnn import simple_cnn_classification
+from data_processing.preprocessing import preprocess_data
+from helpers.callbacks import TensorBoard, ReduceLROnPlateau, ModelCheckpoint, TelegramSummary
+from helpers.datagenerators import simple_image_augmentation
 
 class Model():
     def __init__(self, param_yaml):
         self.__load_params(param_yaml)
     
     def __load_params(self, param_yaml):
-        stream = open(param_file, 'r')
+        stream = open(param_yaml, 'r')
         self.params = yaml.load(stream, Loader = yaml.FullLoader)
 
     def recover_logged_model(self, weights_path):
@@ -33,6 +39,10 @@ class Model():
         return loaded_model
 
     def __log_model(self, path):
+        # Make sure dir exists
+        if not os.path.exists(path):
+            os.makedirs(path)
+
         # Serialize model to JSON
         model_json = self.model.to_json()
         with open(path + "/architecture.json", "w") as json_file:
@@ -60,16 +70,14 @@ class Model():
 
         # 3. Define Model
         optimizer = RMSprop(
-                        lr = self.params["learning_rate"],
-                        rho = self.params["rho"]
-                        epsilon = self.params["epsilon"])
-                        decay = self.params["decay"])
+                        lr = float(self.params["learning_rate"]),
+                        rho = float(self.params["rho"]),
+                        epsilon = float(self.params["epsilon"]),
+                        decay = float(self.params["decay"]))
 
-        self.model = None
+        self.model = simple_cnn_classification(input_shape = x_train[0].shape)  # Default: Start with random weights
         if self.params["train_from_saved_weights"]:
             self.model = self.recover_logged_model(self.params["saved_weights_path"])
-        else:
-            self.model = simple_cnn_classification(input_shape = x_train[0].shape)  # If you wanna start from random weights
         
         self.model.compile(
                         optimizer = optimizer,
@@ -94,7 +102,8 @@ class Model():
                                     save_best_only=True,
                                     mode='max')
         telegram_summary = TelegramSummary()
-        tensorboard = TensorBoard(log_dir = str(self.params["tensorboard_logging_path"]) + "/{}".format(time()))
+        log_dir = str(self.params["tensorboard_logging_path"]) + "/{}".format(time.time())
+        tensorboard = TensorBoard(log_dir = log_dir)
         learning_rate_reduction = ReduceLROnPlateau(
                                                 monitor = 'val_acc', 
                                                 patience = 3,
