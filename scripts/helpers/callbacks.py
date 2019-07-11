@@ -26,14 +26,15 @@ class TelegramSummary(Callback):
         return
 
     def on_epoch_end(self, epoch, logs={}):
-        print("Sending results to telegram")
-        loss = "loss: " + str(round(logs.get('loss'), 2))
-        acc = "acc:  " + str(round(logs.get('acc'), 2))
-        val_loss = "val loss: " + str(round(logs.get('val_loss'), 2))
-        val_acc = "val acc:  " + str(round(logs.get('val_acc'), 2))
+        print("Sending to telegram...")
+        loss = "loss: " + str(round(logs.get('loss'), 4))
+        acc = "acc:  " + str(round(logs.get('acc'), 4))
+        val_loss = "val loss: " + str(round(logs.get('val_loss'), 4))
+        val_acc = "val acc:  " + str(round(logs.get('val_acc'), 4))
         summary = loss + "  " + val_loss + "\n" + acc + "  " + val_acc
 
         answer = self.telegram_bot.send(summary)
+        print("DONE")
         return
 
     def on_batch_begin(self, batch, logs={}):

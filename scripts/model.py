@@ -1,6 +1,7 @@
 import datetime
 import os
 import pandas as pd
+import numpy as np
 from pathlib import Path
 import sys
 import time
@@ -8,14 +9,22 @@ import yaml
 
 # Keras
 from keras.models import model_from_json
-from keras.optimizers import RMSprop
+from keras.optimizers import RMSprop, Adam
+from keras.preprocessing.image import ImageDataGenerator
 
 # Own imports TODO(oleguer): Fix this path problem
 sys.path.append(str(Path(__file__).parent))
 from architectures.simple_cnn import simple_cnn_classification
+from architectures.model2 import model2
 from data_processing.preprocessing import preprocess_data
 from helpers.callbacks import TensorBoard, ReduceLROnPlateau, ModelCheckpoint, TelegramSummary
-from helpers.datagenerators import simple_image_augmentation
+
+
+import tensorflow as tf
+from keras.backend.tensorflow_backend import set_session
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+set_session(tf.Session(config=config))
 
 class Model():
     def __init__(self, param_yaml):
@@ -28,7 +37,7 @@ class Model():
     def recover_logged_model(self, weights_path):
         weights_name = weights_path.split("/")[-1]
         full_model_path = weights_path.replace("/" + weights_name, "")
-        json_file = open(full_model_path + "architecture.json", "r")
+        json_file = open(full_model_path + "/architecture.json", "r")
         loaded_model_json = json_file.read()
         json_file.close()
         loaded_model = model_from_json(loaded_model_json)
@@ -52,8 +61,8 @@ class Model():
         with open(path + "/params.yaml", 'w') as outfile:
             yaml.dump(self.params, outfile, default_flow_style=False)
 
-    def get_submission(model, test, csv_path = "../input/solution.csv"):
-        results = model.predict(test)
+    def get_submission(self, mod, test, csv_path = "../input/solution.csv"):
+        results = mod.predict(test)
         results = np.argmax(results, axis = 1)
         results = pd.Series(results, name="Label")
         submission = pd.concat([pd.Series(range(1, 28001), name = "ImageId"), results], axis = 1)
@@ -74,8 +83,11 @@ class Model():
                         rho = float(self.params["rho"]),
                         epsilon = float(self.params["epsilon"]),
                         decay = float(self.params["decay"]))
+        if str(self.params["optimizer"]) == "Adam":    
+            opimizer = Adam(float(self.params["learning_rate"]))
 
-        self.model = simple_cnn_classification(input_shape = x_train[0].shape)  # Default: Start with random weights
+        # self.model = simple_cnn_classification(input_shape = x_train[0].shape)  # Default: Start with random weights
+        self.model = model2(input_shape = x_train[0].shape)  # Default: Start with random weights
         if self.params["train_from_saved_weights"]:
             self.model = self.recover_logged_model(self.params["saved_weights_path"])
         
@@ -90,11 +102,16 @@ class Model():
         self.__log_model(path = save_path)
 
         # Datagen
-        datagen = simple_image_augmentation()  # TODO(oleguer): Since its not custom this doesnt make much sense
+        datagen_args = dict(rotation_range = 20,
+                        width_shift_range = 0.1,
+                        height_shift_range = 0.1,
+                        shear_range = 0.1,
+                        zoom_range = 0.1)
+        datagen = ImageDataGenerator(**datagen_args)
         datagen.fit(x_train)
 
         # Callbacks:
-        weights_filepath = save_path + "/weights-{epoch:02d}-{val_acc:.2f}.hdf5"
+        weights_filepath = save_path + "/weights-{epoch:0f}-{val_acc:.4f}.hdf5"
         checkpoint = ModelCheckpoint(  # Save model weights after each epoch
                                     filepath=weights_filepath,
                                     monitor='val_acc',
@@ -106,10 +123,10 @@ class Model():
         tensorboard = TensorBoard(log_dir = log_dir)
         learning_rate_reduction = ReduceLROnPlateau(
                                                 monitor = 'val_acc', 
-                                                patience = 3,
+                                                patience = 5,
                                                 verbose = 1,
-                                                factor = 0.5,  # Each epoch reduce lr by half
-                                                min_lr = 0.00001)
+                                                factor = 0.85,  # Each patience epoch reduce lr by half
+                                                min_lr = 1e-10)
         callbacks = [checkpoint, learning_rate_reduction, tensorboard, telegram_summary]
 
         # 4. Fit Model
@@ -120,7 +137,7 @@ class Model():
                             validation_data = (x_val, y_val),
                             verbose = 1,
                             callbacks = callbacks,
-                            steps_per_epoch = x_train.shape[0])
+                            steps_per_epoch = x_train.shape[0] // self.params["batch_size"])  # // is floor division
         # TODO(oleguer): Log history?
         return
     
