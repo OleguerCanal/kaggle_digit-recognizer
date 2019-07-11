@@ -8,3 +8,6 @@ https://www.kaggle.com/c/digit-recognizer
 `pip install requirements.txt`
 
 Download, extract and copy to `input/` the data from: https://www.kaggle.com/c/digit-recognizer/data
+
+## TODOS:
+This repo urgently need a major refactor
